@@ -1,0 +1,84 @@
+-- =========================================
+-- SQL Data Analysis Internship – Task 2
+-- Complete Error-Free Script (MySQL)
+-- =========================================
+
+-- Create database (optional)
+CREATE DATABASE IF NOT EXISTS student_db;
+USE student_db;
+
+-- Drop tables if they already exist
+DROP TABLE IF EXISTS enrollments;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS students;
+
+-- Create Students table (Task-1 base table)
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    department VARCHAR(50)
+) ENGINE=InnoDB;
+
+-- Insert data into Students
+INSERT INTO students VALUES
+(1, 'Amit', 21, 'CSE'),
+(2, 'Neha', 22, 'ECE'),
+(3, 'Rahul', 23, 'IT'),
+(4, 'Sneha', 21, 'CSE');
+
+-- Create Courses table
+CREATE TABLE courses (
+    id INT PRIMARY KEY,
+    name VARCHAR(50)
+) ENGINE=InnoDB;
+
+-- Create Enrollments table
+CREATE TABLE enrollments (
+    student_id INT,
+    course_id INT,
+    grade INT,
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+) ENGINE=InnoDB;
+
+-- Insert data into Courses
+INSERT INTO courses VALUES
+(1, 'SQL'),
+(2, 'Python'),
+(3, 'Data Analytics');
+
+-- Insert data into Enrollments
+INSERT INTO enrollments VALUES
+(1, 1, 85),
+(1, 2, 78),
+(2, 1, 65),
+(2, 3, 72),
+(3, 2, 90),
+(3, 3, 88),
+(4, 1, 35);
+
+-- 1. List all students enrolled in each course
+SELECT s.name AS student_name, c.name AS course_name
+FROM enrollments e
+JOIN students s ON e.student_id = s.id
+JOIN courses c ON e.course_id = c.id;
+
+-- 2. Average grade per course
+SELECT c.name AS course_name, AVG(e.grade) AS average_grade
+FROM enrollments e
+JOIN courses c ON e.course_id = c.id
+GROUP BY c.name;
+
+-- 3. Top 3 students overall
+SELECT s.name AS student_name, AVG(e.grade) AS average_grade
+FROM enrollments e
+JOIN students s ON e.student_id = s.id
+GROUP BY s.name
+ORDER BY average_grade DESC
+LIMIT 3;
+
+-- 4. Count students who failed
+SELECT COUNT(*) AS failed_students
+FROM enrollments
+WHERE grade < 40;
